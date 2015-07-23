@@ -1,4 +1,5 @@
 'use strict';
+import _ from 'lodash';
 import maze from './maze.js';
 import Cell from './cell.js';
 import Border from './border.js';
