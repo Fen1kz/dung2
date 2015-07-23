@@ -7,8 +7,8 @@ export default class Kruskal extends MazeGenerator {
   }
 
   generate() {
-    let cells1d = this.game.o.cells1d;
-    let borders1d = this.game.o.borders1d;
+    let cells1d = this.game.level.cells;
+    let borders1d = this.game.level.borders;
     let groups = cells1d.length;
 
     let removeBorders1d = borders1d.slice();
@@ -19,6 +19,9 @@ export default class Kruskal extends MazeGenerator {
     }
 
     function removeBorder(randomIndex) {
+      //console.log(groups)
+      //console.log(randomIndex)
+      //console.log(removeBorders1d[randomIndex])
       let cells = removeBorders1d[randomIndex].getCells();
       if (cells[0].group != cells[1].group) {
         cells[1].merge(cells[0]);

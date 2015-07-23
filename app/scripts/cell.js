@@ -1,12 +1,13 @@
 import _ from 'lodash';
 
 export default class Cell {
-  constructor(game, X, Y, group) {
+  constructor(game, level, X, Y, group) {
     this.game = game;
+    this.level = level;
     this.X = X;
     this.Y = Y;
     this.group = group;
-    this.cells = [];
+    this.cells = {};
     this.borders = {};
   }
 
@@ -32,29 +33,31 @@ export default class Cell {
     border.cells[this.constructor.opposite(direction)] = this;
   }
 
-  findCell(direction) {
-    if (direction == this.constructor.N()) {
-      return this.game.o.cells2d[this.X][this.Y - 1] ? this.game.o.cells2d[this.X][this.Y - 1] : void 0;
-    } else if (direction == this.constructor.W()) {
-      return this.game.o.cells2d[this.X - 1] && this.game.o.cells2d[this.X - 1][this.Y] ? this.game.o.cells2d[this.X - 1][this.Y] : void 0;
-    } else {
-      throw 'wrong direction ' + direction;
-    }
-  }
-
   merge(cell) {
     //console.log('merging', this, cell);
     if (this.group != cell.group) {
       this.group = cell.group;
-      if (!_.some(this.cells, cell)) {
-        this.cells.push(cell);
-        cell.cells.push(this);
-      }
-      _.each(this.cells, (cell) => cell.merge(this));
+      //if (!_.some(this.cells, cell)) {
+      //  this.cells.push(cell);
+      //  cell.cells.push(this);
+      //}
+      _.values(this.cells, (cell) => cell.merge(this));
     }
   }
 
   draw(ctx) {
-    ctx.fillText(this.group, this.X * 20 + 0, this.Y * 20 + 10);
+    //ctx.fillText(this.group, this.X * 20 + 0, this.Y * 20 + 10);
+    this.offset = 1;
+    this.x = this.X * this.game.c.size;
+    this.y = this.Y * this.game.c.size;
+    this.width = this.height = this.game.c.size;
+
+
+    ctx.fillStyle = "#eee";
+    ctx.fillRect(this.x + this.offset, this.y + this.offset, this.width -  this.offset, this.height - this.offset);
+
+    ctx.strokeStyle = "#ddd";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(this.x + this.offset, this.y + this.offset, this.width -  this.offset, this.height - this.offset);
   }
 }

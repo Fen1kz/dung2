@@ -33,17 +33,7 @@ export default class Game {
 
   draw() {
     this.ctx.clearRect(0, 0, this.c.width, this.c.height);
-    _.each(this.o.borders1d, (border) => {
-      //console.log(border);
-      border.draw(this.ctx);
-    });
-    _.each(this.o.cells1d, (cell) => {
-      //console.log(border);
-      //cell.draw(ctx);
-    });
-
-
-
+    this.level.draw(this.ctx);
     return this;
   }
 }

@@ -11,20 +11,6 @@ class Border {
     this.cells = {};
   }
 
-  draw(ctx) {
-    this.x = this.X * 20;
-    this.y = this.Y * 20;
-
-    ctx.beginPath();
-    ctx.moveTo(this.x, this.y);
-    if (this.H) {
-      ctx.lineTo(this.x + 20, this.y);
-    } else {
-      ctx.lineTo(this.x, this.y + 20);
-    }
-    ctx.stroke();
-  }
-
   getCells() {
     return _.filter(_.values(this.cells), (cell) => cell);
   }
@@ -37,5 +23,21 @@ class Border {
 
     });
     this.cells = {};
+  }
+
+  draw(ctx) {
+    this.x = this.X * this.game.c.size;
+    this.y = this.Y * this.game.c.size;
+
+    ctx.beginPath();
+    ctx.strokeStyle = "#000";
+    ctx.lineWidth = 1;
+    ctx.moveTo(this.x, this.y);
+    if (this.H) {
+      ctx.lineTo(this.x + this.game.c.size, this.y);
+    } else {
+      ctx.lineTo(this.x, this.y + this.game.c.size);
+    }
+    ctx.stroke();
   }
 }
