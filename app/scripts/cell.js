@@ -1,11 +1,45 @@
 import _ from 'lodash';
 
 export default class Cell {
-  constructor(X, Y, group) {
+  constructor(game, X, Y, group) {
+    this.game = game;
     this.X = X;
     this.Y = Y;
     this.group = group;
     this.cells = [];
+    this.borders = {};
+  }
+
+  static N() {
+    return (1 << 0);
+  }
+  static S() {
+    return (1 << 1);
+  }
+  static W() {
+    return (1 << 2);
+  }
+  static E() {
+    return (1 << 3);
+  }
+
+  static opposite(direction) {
+    return (direction << 2) % 15;
+  }
+
+  setBorder(direction, border) {
+    this.borders[direction] = border;
+    border.cells[this.constructor.opposite(direction)] = this;
+  }
+
+  findCell(direction) {
+    if (direction == this.constructor.N()) {
+      return this.game.o.cells2d[this.X][this.Y - 1] ? this.game.o.cells2d[this.X][this.Y - 1] : void 0;
+    } else if (direction == this.constructor.W()) {
+      return this.game.o.cells2d[this.X - 1] && this.game.o.cells2d[this.X - 1][this.Y] ? this.game.o.cells2d[this.X - 1][this.Y] : void 0;
+    } else {
+      throw 'wrong direction ' + direction;
+    }
   }
 
   merge(cell) {

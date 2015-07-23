@@ -1,11 +1,14 @@
 import _ from 'lodash';
+import Cell from './cell.js';
 
 export default
 class Border {
-  constructor(X, Y, H) {
+  constructor(game, X, Y, H) {
+    this.game = game;
     this.X = X;
     this.Y = Y;
     this.H = H;
+    this.cells = {};
   }
 
   draw(ctx) {
@@ -22,36 +25,17 @@ class Border {
     ctx.stroke();
   }
 
-  cells() {
-    return _.filter([
-      this.leftCell
-      , this.topCell
-      , this.rightCell
-      , this.bottomCell
-    ], (cell) => cell);
+  getCells() {
+    return _.filter(_.values(this.cells), (cell) => cell);
   }
 
   remove() {
-    console.log('removing', this);
-    if (this.leftCell) {
-      console.log('leftCell', this.leftCell);
-      this.leftCell.rightBorder = void 0;
-      this.leftCell = void 0;
-    }
-    if (this.topCell) {
-      console.log('topCell', this.topCell);
-      this.topCell.bottomBorder = void 0;
-      this.topCell = void 0;
-    }
-    if (this.rightCell) {
-      console.log('rightCell', this.rightCell);
-      this.rightCell.leftBorder = void 0;
-      this.rightCell = void 0;
-    }
-    if (this.bottomCell) {
-      console.log('bottomCell', this.bottomCell);
-      this.bottomCell.topBorder = void 0;
-      this.bottomCell = void 0;
-    }
+    //console.log('removing', this);
+    _.forIn(this.cells, (cell, direction) => {
+      //console.log('cell', direction);
+      cell.borders[Cell.opposite(direction)] = void 0;
+
+    });
+    this.cells = {};
   }
 }
