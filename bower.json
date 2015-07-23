@@ -1,0 +1,11 @@
+{
+  "name": "dung2-3",
+  "private": true,
+  "dependencies": {
+    "lodash": "~3.10.0"
+  },
+  "devDependencies": {
+    "chai": "~3.2.0",
+    "mocha": "~2.2.5"
+  }
+}
