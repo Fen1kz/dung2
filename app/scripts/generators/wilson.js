@@ -14,6 +14,14 @@ export default class Wilson extends MazeGenerator {
     let target = cells.splice(Math.floor(Math.random() * cells.length), 1)[0];
     target.maze = 'true';
     target.color = '#afa';
+
+    target = cells.splice(Math.floor(Math.random() * cells.length), 1)[0];
+    target.maze = 'true';
+    target.color = '#afa';
+
+    target = cells.splice(Math.floor(Math.random() * cells.length), 1)[0];
+    target.maze = 'true';
+    target.color = '#afa';
     console.log(target);
 
 
@@ -28,37 +36,57 @@ export default class Wilson extends MazeGenerator {
     let direction;
     let i = 25;
 
+    let speed = 50;
+
     game.draw();
 
+    setTimeout(() => {
+      walk(void 0, next);
+    }, speed);
 
-    while (i-- > 0) {
+    function walk(direction, next) {
       let directions = _.keys(next.$cells);
-      console.log('pre-filter', direction, directions);
+      //console.log('pre-filter', direction, directions);
       if (direction) {
         _.remove(directions, (d) => d == direction.opposite());
       }
-      console.log('post-filter', directions);
-
+      //console.log('post-filter', directions);
       direction = Direction.fromString(_.sample(directions));
+
       next.arrow = direction.arrow;
       console.log(next.X, next.Y, 'going to', direction);
       source = next;
       next = next.cell(direction);
+      console.log('went', next.walk);
+
       if (next.color === '#afa') {
-        break;
+        path.map((cell) => {
+          cell.walk = false;
+          cell.color = '#afa';
+          _.remove(cells, (c) => c === cell);
+          game.draw();
+        });
+        //path = [];
+        return;
       }
 
       if (next.walk) {
-        eraseWalk(next)
-        break;
+        eraseWalk(next);
+        setTimeout(() => {
+          walk(void 0, next);
+        }, speed)
+        return;
       }
 
       next.color = '#faa';
+      next.walk = true;
       path.push(next);
-    }
 
-    function walk() {
       game.draw();
+
+      setTimeout(() => {
+        walk(direction, next);
+      }, speed)
     }
 
     function eraseWalk(next) {
@@ -71,7 +99,10 @@ export default class Wilson extends MazeGenerator {
         cell.walk = false;
         game.draw();
         if (cell === next) {
-          break;
+          next.color = '#faa';
+          next.walk = true;
+          path.push(next);
+          return;
         }
       }
     }
