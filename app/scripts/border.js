@@ -8,21 +8,20 @@ class Border {
     this.X = X;
     this.Y = Y;
     this.H = H;
-    this.cells = {};
+    this.$cells = {};
   }
 
   getCells() {
-    return _.filter(_.values(this.cells), (cell) => cell);
+    return _.filter(_.values(this.$cells), (cell) => cell);
   }
 
   remove() {
     //console.log('removing', this);
     _.forIn(this.cells, (cell, direction) => {
       //console.log('cell', direction);
-      cell.borders[Cell.opposite(direction)] = void 0;
-
+      _.remove(cell.$borders, this);
     });
-    this.cells = {};
+    this.$cells = {};
   }
 
   draw(ctx) {

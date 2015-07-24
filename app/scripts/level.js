@@ -1,4 +1,4 @@
-import Cell from './cell.js';
+import {Cell, Directions as Dir} from './cell.js';
 import Border from './border.js';
 
 export default class Level {
@@ -39,29 +39,29 @@ export default class Level {
       let X = cell.X;
       let Y = cell.Y;
       if (cells2d[X][Y - 1]) {
-        cell.cells[Cell.N()] = cells2d[X][Y - 1];
+        cell.$cells[Dir.N.str] = cells2d[X][Y - 1];
 
         let border = new Border(this.game, X, Y, true);
-        cell.setBorder(Cell.N(), border);
-        let anotherCell = cell.cells[Cell.N()];
-        if (anotherCell) anotherCell.setBorder(Cell.S(), border);
+        cell.setBorder(Dir.N, border);
+        let anotherCell = cell.cell(Dir.N);
+        if (anotherCell) anotherCell.setBorder(Dir.S, border);
+        this.borders.push(border);
+      }
+      if (cells2d[X][X - 1]) {
+        cell.$cells[Dir.W.str] = cells2d[X - 1][Y];
+
+        let border = new Border(this.game, X, Y, false);
+        cell.setBorder(Dir.W, border);
+        let anotherCell = cell.cell(Dir.W);
+        if (anotherCell) anotherCell.setBorder(Dir.E, border);
+
         this.borders.push(border);
       }
       if (cells2d[X][Y + 1]) {
-        cell.cells[Cell.S()] = cells2d[X][Y + 1];
-      }
-      if (cells2d[X][X - 1]) {
-        cell.cells[Cell.W()] = cells2d[X - 1][Y];
-
-        let border = new Border(this.game, X, Y, false);
-        cell.setBorder(Cell.W(), border);
-        let anotherCell = cell.cells[Cell.W()];
-        if (anotherCell) anotherCell.setBorder(Cell.E(), border);
-
-        this.borders.push(border);
+        cell.$cells[Dir.S.str] = cells2d[X][Y + 1];
       }
       if (cells2d[X][X + 1]) {
-        cell.cells[Cell.E()] = cells2d[X + 1][Y];
+        cell.$cells[Dir.E.str] = cells2d[X + 1][Y];
       }
     });
     return this;

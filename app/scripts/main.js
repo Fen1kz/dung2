@@ -20,9 +20,11 @@ console.log(document.readyState);
 ready(() => {
   let game = new Game('canvas')
     .level(Level)
-    .generate(Kruskal)
-    //.generate(Wilson)
+    //.generate(Kruskal)
+    .generate(Wilson)
     .draw();
+
+  window.game = game;
 });
 
 

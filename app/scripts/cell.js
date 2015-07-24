@@ -1,47 +1,60 @@
 import _ from 'lodash';
 
-export default class Cell {
+class Direction {
+  constructor(str, num) {
+    this.str = str;
+    this.num = num;
+  }
+
+  opposite() {
+    return this.constructor.fromNumber((this.num << 2) % 15);
+  }
+
+  toString() {
+    return this.str;
+  }
+}
+
+var N = new Direction('N', (1 << 0));
+var E = new Direction('E', (1 << 1));
+var S = new Direction('S', (1 << 2));
+var W = new Direction('W', (1 << 3));
+var Directions = {
+  'N': N
+  ,'E': E
+  ,'S': S
+  ,'W': W
+};
+
+Direction.fromNumber = function (num) {
+  return _.find(Directions, (d) => num === d.num);
+};
+
+class Cell {
   constructor(game, level, X, Y, group) {
     this.game = game;
     this.level = level;
     this.X = X;
     this.Y = Y;
     this.group = group;
-    this.cells = {};
-    this.borders = {};
+    this.$cells = {};
+    this.$borders = {};
   }
 
-  static N() {
-    return (1 << 0);
-  }
-  static S() {
-    return (1 << 1);
-  }
-  static W() {
-    return (1 << 2);
-  }
-  static E() {
-    return (1 << 3);
-  }
-
-  static opposite(direction) {
-    return (direction << 2) % 15;
+  cell(direction) {
+    direction = ((typeof direction === 'string') ? direction : direction.str);
+    return this.$cells[direction];
   }
 
   setBorder(direction, border) {
-    this.borders[direction] = border;
-    border.cells[this.constructor.opposite(direction)] = this;
+    this.$borders[direction.str] = border;
+    border.$cells[direction.opposite().str] = this;
   }
 
   merge(cell) {
-    //console.log('merging', this, cell);
     if (this.group != cell.group) {
       this.group = cell.group;
-      //if (!_.some(this.cells, cell)) {
-      //  this.cells.push(cell);
-      //  cell.cells.push(this);
-      //}
-      _.values(this.cells, (cell) => cell.merge(this));
+      _.values(this.$cells, (cell) => cell.merge(this));
     }
   }
 
@@ -52,12 +65,13 @@ export default class Cell {
     this.y = this.Y * this.game.c.size;
     this.width = this.height = this.game.c.size;
 
-
-    ctx.fillStyle = "#eee";
-    ctx.fillRect(this.x + this.offset, this.y + this.offset, this.width -  this.offset, this.height - this.offset);
+    ctx.fillStyle = this.color ? this.color : '#ddd';
+    ctx.fillRect(this.x + this.offset, this.y + this.offset, this.width - this.offset, this.height - this.offset);
 
     ctx.strokeStyle = "#ddd";
     ctx.lineWidth = 2;
-    ctx.strokeRect(this.x + this.offset, this.y + this.offset, this.width -  this.offset, this.height - this.offset);
+    ctx.strokeRect(this.x + this.offset, this.y + this.offset, this.width - this.offset, this.height - this.offset);
   }
 }
+
+export {Directions, Cell, Direction};
