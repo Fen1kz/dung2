@@ -1,9 +1,10 @@
 import _ from 'lodash';
 
 class Direction {
-  constructor(str, num) {
+  constructor(str, num, arrow) {
     this.str = str;
     this.num = num;
+    this.arrow = arrow;
   }
 
   opposite() {
@@ -11,23 +12,23 @@ class Direction {
   }
 
   toString() {
-    return this.str;
+    return `${this.str}:${this.arrow}}`;
   }
 }
 
-var N = new Direction('N', (1 << 0));
-var E = new Direction('E', (1 << 1));
-var S = new Direction('S', (1 << 2));
-var W = new Direction('W', (1 << 3));
 var Directions = {
-  'N': N
-  ,'E': E
-  ,'S': S
-  ,'W': W
+  N: new Direction('N', (1 << 0), '↑')
+  , E: new Direction('E', (1 << 1), '→')
+  , S: new Direction('S', (1 << 2), '↓')
+  , W: new Direction('W', (1 << 3), '←')
 };
 
 Direction.fromNumber = function (num) {
   return _.find(Directions, (d) => num === d.num);
+};
+
+Direction.fromString = function (str) {
+  return _.find(Directions, (d) => str === d.toString());
 };
 
 class Cell {
@@ -42,13 +43,17 @@ class Cell {
   }
 
   cell(direction) {
-    direction = ((typeof direction === 'string') ? direction : direction.str);
+    //direction = ((typeof direction === 'string') ? direction : direction.str);
     return this.$cells[direction];
   }
 
+  addCell(direction, cell) {
+    this.$cells[direction] = cell;
+  }
+
   setBorder(direction, border) {
-    this.$borders[direction.str] = border;
-    border.$cells[direction.opposite().str] = this;
+    this.$borders[direction] = border;
+    border.$cells[direction.opposite()] = this;
   }
 
   merge(cell) {
@@ -59,14 +64,20 @@ class Cell {
   }
 
   draw(ctx) {
-    //ctx.fillText(this.group, this.X * 20 + 0, this.Y * 20 + 10);
+
     this.offset = 1;
     this.x = this.X * this.game.c.size;
     this.y = this.Y * this.game.c.size;
     this.width = this.height = this.game.c.size;
 
+
     ctx.fillStyle = this.color ? this.color : '#ddd';
     ctx.fillRect(this.x + this.offset, this.y + this.offset, this.width - this.offset, this.height - this.offset);
+
+    if (this.arrow) {
+      ctx.fillStyle = '#000';
+      ctx.fillText(this.arrow, this.x + this.game.c.size * .3, this.y + this.game.c.size * .6);
+    }
 
     ctx.strokeStyle = "#ddd";
     ctx.lineWidth = 2;

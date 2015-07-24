@@ -16,9 +16,7 @@ class Border {
   }
 
   remove() {
-    //console.log('removing', this);
-    _.forIn(this.cells, (cell, direction) => {
-      //console.log('cell', direction);
+    _.forIn(this.$cells, (cell, direction) => {
       _.remove(cell.$borders, this);
     });
     this.$cells = {};

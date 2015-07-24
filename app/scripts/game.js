@@ -16,7 +16,7 @@ export default class Game {
     //canvasEl.style.height = '400px';
 
     this.ctx = this.canvasEl.getContext('2d');
-    this.ctx.font = "12px serif";
+    this.ctx.font = "12px Consolas";
   }
 
   level(levelClass) {

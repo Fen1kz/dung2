@@ -39,7 +39,7 @@ export default class Level {
       let X = cell.X;
       let Y = cell.Y;
       if (cells2d[X][Y - 1]) {
-        cell.$cells[Dir.N.str] = cells2d[X][Y - 1];
+        cell.addCell(Dir.N, cells2d[X][Y - 1]);
 
         let border = new Border(this.game, X, Y, true);
         cell.setBorder(Dir.N, border);
@@ -48,7 +48,7 @@ export default class Level {
         this.borders.push(border);
       }
       if (cells2d[X][X - 1]) {
-        cell.$cells[Dir.W.str] = cells2d[X - 1][Y];
+        cell.addCell(Dir.W, cells2d[X - 1][Y]);
 
         let border = new Border(this.game, X, Y, false);
         cell.setBorder(Dir.W, border);
@@ -58,10 +58,10 @@ export default class Level {
         this.borders.push(border);
       }
       if (cells2d[X][Y + 1]) {
-        cell.$cells[Dir.S.str] = cells2d[X][Y + 1];
+        cell.addCell(Dir.S, cells2d[X][Y + 1]);
       }
       if (cells2d[X][X + 1]) {
-        cell.$cells[Dir.E.str] = cells2d[X + 1][Y];
+        cell.addCell(Dir.E, cells2d[X + 1][Y]);
       }
     });
     return this;
