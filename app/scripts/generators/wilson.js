@@ -1,50 +1,71 @@
-import MazeGenerator from './generator.js';
+import Promise from 'bluebird';
 import _ from 'lodash';
+
+import MazeGenerator from './generator.js';
 import {Direction} from '../cell.js';
 
-export default class Wilson extends MazeGenerator {
+export default
+class Wilson extends MazeGenerator {
   constructor(data) {
     super(data);
+  }
+
+  loop(fn, args) {
+    let speed = 50;
+    return fn.apply(this, args)
+      .tap(() => this.game.draw())
+      .delay(speed)
+      .then((retObject) => {
+        if (retObject.result === false) {
+          return this.loop(fn, retObject.args);
+        }
+      });
   }
 
   generate() {
     let game = this.game;
     let cells = this.game.level.cells.slice();
+    let path;
 
-    let target = cells.splice(Math.floor(Math.random() * cells.length), 1)[0];
-    target.maze = 'true';
-    target.color = '#afa';
+    let makeCellPlaced = (cell) => {
+      cell.maze = true;
+      cell.color = '#afa';
+      cell.walk = false;
+    };
 
-    target = cells.splice(Math.floor(Math.random() * cells.length), 1)[0];
-    target.maze = 'true';
-    target.color = '#afa';
-
-    target = cells.splice(Math.floor(Math.random() * cells.length), 1)[0];
-    target.maze = 'true';
-    target.color = '#afa';
-    console.log(target);
+    let makeCellWalk = (cell) => {
+      cell.color = '#ff0';
+      cell.walk = true;
+    };
 
 
-    let source;
-    let next = cells.splice(Math.floor(Math.random() * cells.length), 1)[0];
-    next.color = '#ff0';
-    next.walk = true;
-    console.log(cells.length);
+    //.then((data) => {
+    //  //console.log(data);
+    //});
 
-    let path = [next];
+    let walkToTarget = Promise.method(() => {
+      game.draw();
 
-    let direction;
-    let i = 25;
+      //let target = cells.splice(Math.floor(Math.random() * cells.length), 1)[0];
+      let target = cells.shift();
+      makeCellPlaced(target);
 
-    let speed = 50;
+      let next = cells.splice(Math.floor(Math.random() * cells.length), 1)[0];
+      makeCellWalk(next);
 
-    game.draw();
+      path = [next];
+      let direction;
 
-    setTimeout(() => {
-      walk(void 0, next);
-    }, speed);
+      //this.loop(() => {
+      //  return walk(void 0, next);
+      //});
 
-    function walk(direction, next) {
+      let x = this.loop(walk, [void 0, next]);
+      console.log(x)
+      return x;
+    });
+
+    let walk = Promise.method((direction, next) => {
       let directions = _.keys(next.$cells);
       //console.log('pre-filter', direction, directions);
       if (direction) {
@@ -54,40 +75,51 @@ export default class Wilson extends MazeGenerator {
       direction = Direction.fromString(_.sample(directions));
 
       next.arrow = direction.arrow;
-      console.log(next.X, next.Y, 'going to', direction);
-      source = next;
+      //console.log(next.X, next.Y, 'going to', direction);
       next = next.cell(direction);
-      console.log('went', next.walk);
+      //console.log('went', next.walk);
 
       if (next.color === '#afa') {
         path.map((cell) => {
-          cell.walk = false;
-          cell.color = '#afa';
+          makeCellPlaced(cell);
           _.remove(cells, (c) => c === cell);
-          game.draw();
         });
-        //path = [];
-        return;
+        path = [];
+        return {
+          result: true
+        }
       }
 
       if (next.walk) {
         eraseWalk(next);
-        setTimeout(() => {
-          walk(void 0, next);
-        }, speed)
-        return;
+        return {
+          result: false
+          , args: [void 0, next]
+        };
       }
 
       next.color = '#faa';
       next.walk = true;
+      if (next.arrow) delete next.arrow;
       path.push(next);
 
       game.draw();
 
-      setTimeout(() => {
-        walk(direction, next);
-      }, speed)
-    }
+      return {
+        result: false
+        , args: [direction, next]
+      };
+    });
+
+    this.loop(() => {
+      return walkToTarget()
+        .tap(() => {console.log('heh', cells.length)})
+        .then(() => {
+          return {
+            result: cells.length < 2
+          }
+        })
+    });
 
     function eraseWalk(next) {
       game.draw();
